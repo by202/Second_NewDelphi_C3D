@@ -1,0 +1,8 @@
+#####These files work for keras C3D ######
+
+###Need to download video and pre-trained model ####
+
+c3d-pretrained.pth
+
+12.avi
+
