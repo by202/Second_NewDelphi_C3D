@@ -8,6 +8,7 @@ use protocols_sys::{key_share::KeyShare, ClientFHE, ServerFHE};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaChaRng;
 use std::net::{TcpListener, TcpStream};
+// use std::time::{Duration, Instant};
 
 struct TenBitExpParams {}
 impl FixedPointParameters for TenBitExpParams {
@@ -52,6 +53,7 @@ mod beavers_mul {
     #[test]
     fn test_beavers_mul() {
         let num_triples = 100;
+        // let start = Instant::now();
         let mut rng = ChaChaRng::from_seed(RANDOMNESS);
 
         let mut plain_x_s = Vec::with_capacity(num_triples);
@@ -85,10 +87,18 @@ mod beavers_mul {
             y_s_2.push(s22);
         }
 
+        // let duration = start.elapsed();
+        // println!("Time elapsed (Give shares to each party) is: {:?}", duration);
+
+
         // Keygen
         let mut key_share = KeyShare::new();
         let (cfhe, keys_vec) = key_share.generate();
         let sfhe = key_share.receive(keys_vec);
+
+        // let duration_2 = start.elapsed();
+        // let duration = start.elapsed();
+        // println!("Time elapsed (Keygen) is: {:?}", duration);
 
         // Party 1 acts as the server, Party 2 as the client
         let addr = "127.0.0.1:8005";
@@ -169,6 +179,9 @@ mod beavers_mul {
             let n4 = s1.combine(&s2);
             assert_eq!(n4, n3, "iteration {} failed", i);
         }
+        
+        // let duration = start.elapsed();
+        // println!("Time elapsed two party build commnuicate is: {:?}", duration);
     }
 }
 
@@ -178,6 +191,7 @@ mod gc {
 
     #[test]
     fn test_gc_relu() {
+        // let start = Instant::now();
         let mut rng = ChaChaRng::from_seed(RANDOMNESS);
         let mut plain_x_s = Vec::with_capacity(1001);
         let mut plain_results = Vec::with_capacity(1001);
@@ -302,6 +316,9 @@ mod gc {
             let result = plain_results[i];
             assert_eq!(server_share.combine(&client_share), result);
         }
+
+        // let duration = start.elapsed();
+        // println!("Time elapsed two party test_gc_relu: {:?}", duration);
     }
 }
 
@@ -506,33 +523,33 @@ mod linear {
                         inp_r
                             .iter()
                             .zip(inp_out.iter())
-                            .enumerate()
-                            .for_each(|(i, (r, out))| {
-                                println!(
-                                    "IDX {}:           {}        {}",
-                                    i + inp_idx * row_size + chan_idx * chan_size,
-                                    r,
-                                    out
-                                );
-                                let delta = f64::from(*r) - f64::from(*out);
-                                if delta.abs() > 0.5 {
-                                    println!(
-                                        "{:?}-th index failed {:?} {:?} {} {}",
-                                        i,
-                                        r.signed_reduce(),
-                                        out.signed_reduce(),
-                                        r,
-                                        out
-                                    );
-                                    println!(
-                                        "{} + {} = {}",
-                                        client_next_layer_share[[0, chan_idx, inp_idx, i]].inner,
-                                        server_next_layer_share[[0, chan_idx, inp_idx, i]].inner,
-                                        r
-                                    );
-                                    success = false;
-                                }
-                            });
+                            .enumerate();
+                            // .for_each(|(i, (r, out))| {
+                            //     println!(
+                            //         "IDX {}:           {}        {}",
+                            //         i + inp_idx * row_size + chan_idx * chan_size,
+                            //         r,
+                            //         out
+                            //     );
+                            //     let delta = f64::from(*r) - f64::from(*out);
+                            //     if delta.abs() > 0.5 {
+                            //         println!(
+                            //             "{:?}-th index failed {:?} {:?} {} {}",
+                            //             i,
+                            //             r.signed_reduce(),
+                            //             out.signed_reduce(),
+                            //             r,
+                            //             out
+                            //         );
+                            //         println!(
+                            //             "{} + {} = {}",
+                            //             client_next_layer_share[[0, chan_idx, inp_idx, i]].inner,
+                            //             server_next_layer_share[[0, chan_idx, inp_idx, i]].inner,
+                            //             r
+                            //         );
+                            //         success = false;
+                            //     }
+                            // });
                     });
             });
         assert!(success);
