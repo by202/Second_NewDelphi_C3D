@@ -1,6 +1,6 @@
-#####These files work for keras C3D
+#These files work for keras C3D
 
-### Note: Need to download video and pre-trained model ####
+#Note: Need to download video and pre-trained model
 
 c3d-pretrained.pth
 
